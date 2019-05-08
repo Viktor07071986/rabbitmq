@@ -2,34 +2,27 @@
 namespace App;
 
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Exchange\AMQPExchangeType;
-use PhpAmqpLib\Message\AMQPMessage;
 
 class Reader implements Base {
+
     function render() {
-        $queue = "ololo";
-        $exchange = "amq.direct";
+        echo "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
+            Сколько сообщений выгрузить из очереди RabbitMQ?<br/>
+            <input type='text' name='count_queue_message' required placeholder='Выберите значение больше 0' size='25' value='".$_POST["count_queue_message"]."'><br/><br/>
+            <input type='submit' value='Выгрузить'/>
+        </form>";
+    }
 
-        $connection = new AMQPStreamConnection(
-                '10.19.7.5',
-                5672,
-                'rabbitmq',
-                'rabbitmq',
-                '/', false, 'AMQPLAIN', null, 'en_US', 30
-            );
+    function processData() {
+        //echo "Hello, I'am processData from READER";
+        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
         $channel = $connection->channel();
-        $channel->queue_declare($queue, false, true, false, false);
-        $channel->exchange_declare("amq.direct", AMQPExchangeType::DIRECT, false, true, false);
-
-        $channel->queue_bind($queue, $exchange);
-        $messageBody = "ololololololololololololololo";
-        $message = new AMQPMessage($messageBody, array('content_type' => 'text/plain', 'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-        $channel->basic_publish($message, $exchange);
+        $result = ($channel->basic_get('RabbitMQQueue', true, null)->body);
+        //var_dump($result);
         $channel->close();
         $connection->close();
-        echo "Hello, I'am render from READER";
     }
-    function processData() {
-        echo "Hello, I'am processData from READER";
-    }
+
 }
+
+?>
