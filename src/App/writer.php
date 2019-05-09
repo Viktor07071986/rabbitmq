@@ -32,7 +32,7 @@ class Writer implements Base {
         );
         $channel = $connection->channel();
         $channel->queue_declare($queue, false, true, false, false);
-        $channel->exchange_declare("amq.direct", AMQPExchangeType::DIRECT, false, true, false);
+        $channel->exchange_declare($exchange, AMQPExchangeType::DIRECT, false, true, false);
         $channel->queue_bind($queue, $exchange);
         $messageBody = json_encode($_POST);
         $message = new AMQPMessage($messageBody, array('content_type' => 'text/plain', 'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));

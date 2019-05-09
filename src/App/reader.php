@@ -1,7 +1,7 @@
 <?php
 namespace App;
 
-use PhpAmqpLib\Connection\AMQPStreamConnection;
+//use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class Reader implements Base {
 
@@ -14,49 +14,14 @@ class Reader implements Base {
     }
 
     function processData() {
-        //echo "Hello, I'am processData from READER";
+        echo "Hello, I'am processData from READER";
         /*$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
         $channel = $connection->channel();
         $result = ($channel->basic_get('RabbitMQQueue', true, null)->body);
         //var_dump($result);
         $channel->close();
         $connection->close();*/
-
-        $connection = new AMQPStreamConnection(
-            'localhost',
-            5672,
-            'guest',
-            'guest'
-        );
-        $channel = $connection->channel();
-        $channel->queue_declare(
-            'RabbitMQQueue',
-            false,
-            true,
-            false,
-            false
-            );
-        $channel->basic_consume(
-            'RabbitMQQueue',
-            '',
-            false,
-            true,
-            false,
-            false,
-            array($this, 'processOrder')
-        );
-        while(count($channel->callbacks)) {
-            //$channel->wait();
-        }
-        $channel->close();
-        $connection->close();
     }
-
-    public function processOrder($msg) {
-        /* ... КОД ОБРАБОТКИ ЗАКАЗА ... */
-        echo $msg;
-    }
-
 
 }
 
