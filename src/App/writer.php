@@ -15,8 +15,7 @@ class Writer implements Base {
             <input type='text' name='header_message' required value='".$_POST["header_message"]."'><br/>
             Сообщение:<br/>
             <textarea rows='10' cols='45' name='text_message' required></textarea><br/>
-            Дата:<br/>
-            <input type='text' name='date_message' value='".date("d/m/Y H:i:s")."' readonly><br/><br/>
+            <input type='hidden' name='date_message' value='".date("d/m/Y H:i:s")."'><br/><br/>
             <input type='submit' value='Отправить'/>
         </form>";
     }
