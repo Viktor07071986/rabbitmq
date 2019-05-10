@@ -5,3 +5,5 @@ interface Base {
     function render();
     function processData();
 }
+
+?>

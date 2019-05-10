@@ -2,7 +2,7 @@
     "autoload": {
         "psr-4": {
             "Services\\": "services",
-            "App\\": "App"
+            "App\\": "app"
         }
     },
     "require": {
