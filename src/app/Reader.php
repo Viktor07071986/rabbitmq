@@ -1,7 +1,7 @@
 <?php
 namespace App;
 
-//use PhpAmqpLib\Connection\AMQPStreamConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class Reader implements Base {
 
@@ -14,13 +14,20 @@ class Reader implements Base {
     }
 
     function processData() {
-        echo "Hello, I'am processData from READER";
-        /*$connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
+        $connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
         $channel = $connection->channel();
-        $result = ($channel->basic_get('RabbitMQQueue', true, null)->body);
-        //var_dump($result);
+        for ($i = 0; $i < $_POST["count_queue_message"]; $i++) {
+            $result = ($channel->basic_get('RabbitMQQueue', true, null)->body);
+            $rez = json_decode($result, true);
+            if (is_null($rez)) {
+                echo "<hr/>Доступных сообщений для выгрузки больше нет!";
+                break;
+            } else {
+                echo "<hr/>" . $rez["firstname"] . " " . $rez["header_message"] . " " . $rez["text_message"] . " " . $rez["date_message"];
+            }
+        }
         $channel->close();
-        $connection->close();*/
+        $connection->close();
     }
 
 }
