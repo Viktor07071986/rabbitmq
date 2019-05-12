@@ -7,6 +7,18 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Writer implements Base {
 
+    public $queue;
+    public $exchange;
+    public $connection;
+    public $channel;
+
+    function __construct() {
+        $this->queue = "RabbitMQQueue";
+        $this->exchange = "amq.direct";
+        $this->connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest', '/', false, 'AMQPLAIN', null, 'en_US', 30);
+        $this->channel = $this->connection->channel();
+    }
+
     function render() {
         echo "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
             Логин:<br/>
@@ -21,24 +33,17 @@ class Writer implements Base {
     }
 
     function processData() {
-        $queue = "RabbitMQQueue";
-        $exchange = "amq.direct";
-        $connection = new AMQPStreamConnection(
-            'localhost',
-            5672,
-            'guest',
-            'guest',
-            '/', false, 'AMQPLAIN', null, 'en_US', 30
-        );
-        $channel = $connection->channel();
-        $channel->queue_declare($queue, false, true, false, false);
-        $channel->exchange_declare($exchange, AMQPExchangeType::DIRECT, false, true, false);
-        $channel->queue_bind($queue, $exchange);
+        $this->channel->queue_declare($this->queue, false, true, false, false);
+        $this->channel->exchange_declare($this->exchange, AMQPExchangeType::DIRECT, false, true, false);
+        $this->channel->queue_bind($this->queue, $this->exchange);
         $messageBody = json_encode($_POST);
         $message = new AMQPMessage($messageBody, array('content_type' => 'text/plain', 'delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT));
-        $channel->basic_publish($message, $exchange);
-        $channel->close();
-        $connection->close();
+        $this->channel->basic_publish($message, $this->exchange);
+    }
+
+    function __destruct() {
+        $this->channel->close();
+        $this->connection->close();
     }
 
 }
