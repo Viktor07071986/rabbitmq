@@ -5,8 +5,9 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class Reader implements Base {
 
-    public $connection;
-    public $channel;
+    private $connection;
+    private $channel;
+    private $return;
 
     function __construct() {
         $this->connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
@@ -14,7 +15,7 @@ class Reader implements Base {
     }
 
     function render() {
-        echo "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
+        return "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
             Сколько сообщений выгрузить из очереди RabbitMQ?<br/>
             <input type='text' name='count_queue_message' required placeholder='Выберите значение больше 0' size='25' value='".$_POST["count_queue_message"]."'><br/><br/>
             <input type='submit' value='Выгрузить'/>
@@ -23,7 +24,7 @@ class Reader implements Base {
 
     function processData() {
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            echo "<table border='1px solid black;' cellspacing='0' cellpadding='7'>
+            $this->return = "<table border='1px solid black;' cellspacing='0' cellpadding='7'>
                     <tr>
                         <th>Логин</th>
                         <th>Заголовок сообщения</th>
@@ -35,10 +36,10 @@ class Reader implements Base {
             $result = ($this->channel->basic_get('RabbitMQQueue', true, null)->body);
             $rez = json_decode($result, true);
             if (is_null($rez)) {
-                echo "<hr/>Доступных сообщений для выгрузки больше нет!";
+                $this->return .= "<hr/>Доступных сообщений для выгрузки больше нет!";
                 break;
             } else {
-                echo "<tr>
+                $this->return .= "<tr>
                     <td>".$rez["firstname"]."</td>
                     <td>".$rez["header_message"]."</td>
                     <td>".nl2br($rez["text_message"])."</td>
@@ -47,8 +48,9 @@ class Reader implements Base {
             }
         }
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            echo "</table>";
+            $this->return .= "</table>";
         }
+        return $this->return;
     }
 
     function __destruct() {

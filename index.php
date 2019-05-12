@@ -12,9 +12,9 @@ $class = "App\\".$class;
 
 if (class_exists($class)) {
     $factory = new $class();
-    $factory->render();
+    echo $factory->render();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        $factory->processData();
+        echo $factory->processData();
     }
 }
 

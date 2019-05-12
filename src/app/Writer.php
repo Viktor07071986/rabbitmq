@@ -7,10 +7,10 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class Writer implements Base {
 
-    public $queue;
-    public $exchange;
-    public $connection;
-    public $channel;
+    private $queue;
+    private $exchange;
+    private $connection;
+    private $channel;
 
     function __construct() {
         $this->queue = "RabbitMQQueue";
@@ -20,7 +20,7 @@ class Writer implements Base {
     }
 
     function render() {
-        echo "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
+        return "<form action=".$_SERVER["REQUEST_URI"]." method='POST' style='margin-top: 25px;'>
             Логин:<br/>
             <input type='text' name='firstname' required value='".$_POST["firstname"]."'><br/>
             Заголовок сообщения:<br/>
