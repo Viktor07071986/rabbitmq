@@ -10,6 +10,7 @@ $loader->add('App\\', __DIR__.'/src/');
 $class = ucfirst(ltrim($_SERVER["REQUEST_URI"], "/"));
 $class = "App\\".$class;
 
+
 if (class_exists($class)) {
     $factory = new $class();
     echo $factory->render();
