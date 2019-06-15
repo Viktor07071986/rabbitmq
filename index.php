@@ -14,7 +14,11 @@ if (class_exists($class)) {
     $factory = new $class();
     echo $factory->render();
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        echo $factory->processData();
+        if ($class=="App\Reader") {
+            echo "<pre>"; var_dump($factory->processData()); echo "</pre>";
+        } elseif ($class=="App\Writer") {
+            $factory->processData();
+        }
     }
 }
 

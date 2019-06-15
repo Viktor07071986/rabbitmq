@@ -7,7 +7,8 @@ class Reader implements Base {
 
     private $connection;
     private $channel;
-    private $return;
+    //private $return;
+    private $data = array();
 
     function __construct() {
         $this->connection = new AMQPStreamConnection('localhost', 5672, 'guest', 'guest');
@@ -23,34 +24,21 @@ class Reader implements Base {
     }
 
     function processData() {
+
         if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $this->return = "<table border='1px solid black;' cellspacing='0' cellpadding='7'>
-                    <tr>
-                        <th>Логин</th>
-                        <th>Заголовок сообщения</th>
-                        <th>Сообщение</th>
-                        <th>Время</th>
-                    </tr>";
-        }
-        for ($i = 0; $i < $_POST["count_queue_message"]; $i++) {
-            $result = ($this->channel->basic_get('RabbitMQQueue', true, null)->body);
-            $rez = json_decode($result, true);
-            if (is_null($rez)) {
-                $this->return .= "<hr/>Доступных сообщений для выгрузки больше нет!";
-                break;
-            } else {
-                $this->return .= "<tr>
-                    <td>".$rez["firstname"]."</td>
-                    <td>".$rez["header_message"]."</td>
-                    <td>".nl2br($rez["text_message"])."</td>
-                    <td>".$rez["date_message"]."</td>
-                </tr>";
+            for ($i = 0; $i < $_POST["count_queue_message"]; $i++) {
+                $result = ($this->channel->basic_get('RabbitMQQueue', true, null)->body);
+                $rez = json_decode($result, true);
+                if (is_null($rez)) {
+                    echo "<p>Доступных сообщений для выгрузки больше нет!</p>";
+                    break;
+                } else {
+                    $this->data[$i]=$rez;
+                }
             }
+            return $this->data;
         }
-        if ($_SERVER["REQUEST_METHOD"] == "POST") {
-            $this->return .= "</table>";
-        }
-        return $this->return;
+
     }
 
     function __destruct() {
